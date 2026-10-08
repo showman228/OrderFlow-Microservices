@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 # from app.database import init_db
-from app.config import settings
+from ..app.config import settings
 
 # async def lifespan(_: FastAPI):
 #     await init_db
