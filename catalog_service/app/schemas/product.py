@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import List, Optional
-from app.schemas import CategoryResponse
+from ..schemas.category import CategoryResponse
 
 class ProductBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
