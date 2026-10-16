@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING
+
 from datetime import datetime, UTC
 from sqlalchemy import ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from catalog_service.app.database import Base
 from typing import Optional
+
+if TYPE_CHECKING:
+    from catalog_service.app.models.category import Category
 
 
 class Product(Base):
@@ -18,7 +23,7 @@ class Product(Base):
     )
     image_url: Mapped[str]
 
-    category: Optional["Category"] = relationship(back_populates="products")
+    category: Mapped["Category"] = relationship(back_populates="products")
 
     def __repr__(self):
         return f"Product: {self.id}, name: {self.name}, description: {self.description}, price: {self.price}"

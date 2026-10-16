@@ -9,12 +9,12 @@ class Settings(BaseSettings):
     APP_NAME: str = "OrderFlow_Microservices"
 
     POSTGRES_USER: str
-    POSTGRES_PASSWORD: str 
-    POSTGRES_HOST: str 
-    POSTGRES_PORT: int 
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
     POSTGRES_DB: str
 
-    CORS_ORIGIN: Union[List[str], str] = [
+    CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://localhost:5500",
