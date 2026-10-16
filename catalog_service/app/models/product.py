@@ -1,8 +1,9 @@
 from datetime import datetime, UTC
 from sqlalchemy import ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.database import Base
-from app.models import Category
+from catalog_service.app.database import Base
+from typing import Optional
+
 
 class Product(Base):
     __tablename__ = "products"
@@ -12,10 +13,12 @@ class Product(Base):
     price: Mapped[int] = mapped_column(nullable=False)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    category_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
     image_url: Mapped[str]
 
-    category: Mapped["Category"] = relationship(back_populates="products")
+    category: Optional["Category"] = relationship(back_populates="products")
 
     def __repr__(self):
         return f"Product: {self.id}, name: {self.name}, description: {self.description}, price: {self.price}"
