@@ -8,7 +8,7 @@ class OrderBase(BaseModel):
     status: str
     total_price: float
 
-class OrderCreateBase(OrderBase):
+class OrderCreate(OrderBase):
     pass
 
 
