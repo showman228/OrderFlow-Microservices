@@ -7,7 +7,7 @@ from order_service.app.database import Base
 from typing import List
 
 if TYPE_CHECKING:
-    from ...app.models.order_item import OrderItem
+    from order_service.app.models.order_item import OrderItem
 
 
 class Order(Base):
@@ -17,7 +17,7 @@ class Order(Base):
     status: Mapped[str]
     total_price: Mapped[float] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.now(UTC)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
     
