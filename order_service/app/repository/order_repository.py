@@ -55,7 +55,7 @@ class OrderRepository:
     async def update(self, order_id: int, order_data: OrderUpdate) -> Order | None:
         order = await self.get_by_id(order_id)
 
-        if not order:
+        if order is None:
             return None
 
         for field, value in order_data.model_dump(exclude_unset=True).items():
