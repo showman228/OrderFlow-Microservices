@@ -56,20 +56,34 @@ class OrderItemService:
             )
 
         item = await self.crud.create(
-            product_id=item_data.product_id,
-            product_name=item_data.product_name,
-            quantity=item_data.quantity,
-            price=item_data.price,
+            product_id=product.product_id,
+            product_name=product.product_name,
+            quantity=product.quantity,
+            price=product.price,
             order_id=order_id,
         )
 
         return OrderItemResponse.model_validate(item)
 
-    #Дореализовать 
-    async def update(self):
-        pass
+    async def update(self, order_item_id: int, order_item_data: OrderItemUpdate) -> OrderItemResponse:
+        order_item = await self.crud.update(order_item_id, order_item_data)
 
-    #Дореализовать
-    async def delete(self):
-        pass
+        if order_item is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Product not found by id"
+            )
+
+        return OrderItemResponse.model_validate(order_item)
+
+    async def delete(self, order_item_id: int) -> bool:
+        order_item = await self.crud.delete(order_item_id)
+
+        if order_item is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Product not found by id"
+            )     
+
+        return True
    
