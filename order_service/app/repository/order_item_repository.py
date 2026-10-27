@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from order_service.app.models.order import Order
-from order_service.app.models.order_item import OrderItem
+from order_service.app.models.order_item import OrderItem, OrderItemUpdate
 from typing import List
 from httpx import AsyncClient
 
@@ -29,7 +28,7 @@ class OrderItemRepository:
             product_name: str,
             quantity: int,
             price: float
-        ) -> Order:
+        ) -> OrderItem:
 
         order_item = OrderItem(
             order_id=order_id,
@@ -40,23 +39,38 @@ class OrderItemRepository:
         )
 
         self.db.add(order_item)
-        self.db.commit()
-        self.db.refresh(order_item)
+        await self.db.commit()
+        await self.db.refresh(order_item)
 
         return order_item
 
-    # Дореализовать
     async def update(self,
-            order_id: int, 
-            product_id: int,
-            product_name: str,
-            quantity: int,
-            price: float
-        ) -> Order:
+            order_item_id: int,
+            order_item_data: OrderItemUpdate 
+        ) -> OrderItem:
 
-        pass
+        order_item = await self.get_by_id(order_item_id)
 
-    
-    # Дореализовать
-    async def delete(self):
-        pass
+        if order_item is None:
+            return None
+
+        for field, value in order_item_data.model_dump(exclude_unset=True).items():
+            setattr(order_item, field, value)
+
+        await self.db.commit()
+        await self.db.refresh(order_item)
+
+        return order_item
+
+    async def delete(self, order_item_id: int) -> bool:
+
+        order_item = await self.get_by_id(order_item_id)
+
+        if order_item is None:
+            return False
+
+        await self.db.delete(order_item)
+        await self.db.commit()
+
+        return True
+        
