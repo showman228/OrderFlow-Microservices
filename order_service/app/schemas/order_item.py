@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -18,10 +17,10 @@ class OrderItemCreate(OrderItem):
 
 
 class OrderItemUpdate(BaseModel):
-    product_id: Optional[int] = None
-    product_name: Optional[str] = None
-    quantity: Optional[int] = None
-    price: Optional[float] = None
+    product_id: int | None = None
+    product_name: str | None = None
+    quantity: int | None = None
+    price: float | None = None
 
 
 class OrderItemResponse(BaseModel):
