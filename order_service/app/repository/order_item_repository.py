@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from order_service.app.models.order_item import OrderItem, OrderItemUpdate
+from order_service.app.models.order_item import OrderItem
+from order_service.app.schemas.order_item import OrderItemUpdate
 from typing import List
 from httpx import AsyncClient
 
