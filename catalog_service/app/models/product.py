@@ -4,7 +4,6 @@ from datetime import datetime, UTC
 from sqlalchemy import ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from catalog_service.app.database import Base
-from typing import Optional
 
 if TYPE_CHECKING:
     from catalog_service.app.models.category import Category
