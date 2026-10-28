@@ -4,7 +4,6 @@ from datetime import datetime, UTC
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from order_service.app.database import Base
-from typing import List
 
 if TYPE_CHECKING:
     from order_service.app.models.order_item import OrderItem
@@ -19,7 +18,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
-    items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
+    items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
     
 
     def __repr__(self):

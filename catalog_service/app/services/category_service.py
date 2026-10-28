@@ -2,15 +2,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from catalog_service.app.repositories.category_repository import CategoryRepository
 
-from typing import List
-
 from catalog_service.app.schemas.category import CategoryCreate, CategoryResponse
 
 class CategoryService:
     def __init__(self, crud: AsyncSession):
         self.crud = CategoryRepository(crud)
 
-    async def get_all(self) -> List[CategoryResponse]:
+    async def get_all(self) -> list[CategoryResponse]:
         categories = await self.crud.get_all()
         return [CategoryResponse.model_validate(cat) for cat in categories]
 

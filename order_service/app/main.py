@@ -2,17 +2,21 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from ..app.database import init_db
-from ..app.config import settings
+from order_service.app.database import init_db
+from order_service.app.config import settings
 
 from order_service.app.routers.cart import router as cart_router
 from order_service.app.routers.order import router as order_router
+from order_service.app.services.catalog_client import CatalogClient
+import httpx
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
     await init_db()
+    app.state.catalog_client = httpx.AsyncClient(base_url=settings.CATALOG_SERVICE_URL)
     yield
+    await app.state.catalog_client.aclose()
 
 
 app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)
@@ -27,13 +31,19 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
-app.include_router(...)
-app.include_router(...)
+app.include_router(cart_router)
+app.include_router(order_router)
 
 
 @app.get("/")
 async def main():
     return {"message": "Welcome to Order-Service", "docs": "/docs"}
+
+
+@app.get("/health/catalog")
+async def health_catalog_client():
+    client = CatalogClient(app.state.catalog_client)
+    return await client.healthcheck()
 
 
 @app.get("/health")

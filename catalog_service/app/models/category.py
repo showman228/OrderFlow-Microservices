@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
 from catalog_service.app.database import Base
 
 if TYPE_CHECKING:
@@ -17,7 +16,7 @@ class Category(Base):
     )
     slug: Mapped[str] = mapped_column(String(100), unique=True, index=True)
 
-    products: Mapped[List["Product"]] = relationship(back_populates="category")
+    products: Mapped[list["Product"]] = relationship(back_populates="category")
 
     def __repr__(self):
         return f"<Category id: {self.id}, name: {self.name}, slug: {self.slug}>"

@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from typing import List
 
 from catalog_service.app.schemas.product import ProductResponse, ProductCreate
 from catalog_service.app.repositories.product_repository import ProductRepository
@@ -9,7 +8,7 @@ class ProductService:
     def __init__(self, crud: AsyncSession):
         self.crud = ProductRepository(crud)
 
-    async def get_all(self) -> List[ProductResponse]:
+    async def get_all(self) -> list[ProductResponse]:
         products = await self.crud.get_all()
         return [ProductResponse.model_validate(prod) for prod in products]
 
@@ -35,7 +34,7 @@ class ProductService:
 
         return ProductResponse.model_validate(product)
 
-    async def get_product_by_category_id(self, category_id: int) -> List[ProductResponse]:
+    async def get_product_by_category_id(self, category_id: int) -> list[ProductResponse]:
         products = await self.crud.get_by_category_id(category_id)
         return [ProductResponse.model_validate(prod) for prod in products]
 

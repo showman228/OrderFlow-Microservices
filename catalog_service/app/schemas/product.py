@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import List, Optional
-from ..schemas.category import CategoryResponse
+
+from pydantic import BaseModel, Field, ConfigDict
+
+from catalog_service.app.schemas.category import CategoryResponse
+
 
 class ProductBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -10,7 +12,8 @@ class ProductBase(BaseModel):
     description: str = Field(None, description="Product description")
     price: int = Field(..., gt=0, description="Product price")
     category_id: int = Field(..., description="category id")
-    image_url: Optional[str] = Field(None, description="Product image url")
+    image_url: str | None = Field(None, description="Product image url")
+
 
 class ProductCreate(ProductBase):
     pass
@@ -24,12 +27,13 @@ class ProductResponse(BaseModel):
     description: str
     price: int
     category_id: int
-    image_url: Optional[str]
+    image_url: str | None
     created_at: datetime
     category: CategoryResponse = Field(..., description="Product category details")
+
 
 class ProductListResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    products: List[ProductResponse]
+    products: list[ProductResponse]
     total: int = Field(..., description="Total product Count")
