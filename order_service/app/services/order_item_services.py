@@ -1,4 +1,3 @@
-from typing import List
 import httpx
 
 from order_service.app.schemas.catalog_product import CatalogProductResponse
@@ -16,7 +15,7 @@ class OrderItemService:
         self.crud = OrderItemRepository(db)
         self.catalog_client = catalog_client
 
-    async def get_all(self) -> List[OrderItemResponse]:
+    async def get_all(self) -> list[OrderItemResponse]:
         order_items = await self.crud.get_all()
         return [OrderItemResponse.model_validate(item) for item in order_items]
 
@@ -31,7 +30,7 @@ class OrderItemService:
 
         return OrderItemResponse.model_validate(order_item)
 
-    async def get_by_order_id(self, order_id: int) -> List[OrderItemResponse]:
+    async def get_by_order_id(self, order_id: int) -> list[OrderItemResponse]:
         order_items = await self.crud.get_by_order_id(order_id)
         return [OrderItemResponse.model_validate(item) for item in order_items]
 
@@ -56,11 +55,11 @@ class OrderItemService:
             )
 
         item = await self.crud.create(
-            product_id=product.product_id,
-            product_name=product.product_name,
-            quantity=product.quantity,
-            price=product.price,
             order_id=order_id,
+            product_id=product.id,
+            product_name=product.name,
+            quantity=item_data.quantity,
+            price=product.price,
         )
 
         return OrderItemResponse.model_validate(item)
