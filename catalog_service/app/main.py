@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from ..app.database import init_db
-from ..app.config import settings
+from catalog_service.app.database import init_db
+from catalog_service.app.config import settings
 
 from catalog_service.app.routers.product import router as product_router
 from catalog_service.app.routers.category import router as category_router
