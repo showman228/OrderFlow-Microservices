@@ -1,4 +1,3 @@
-from typing import List, Union
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,7 +13,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_DB: str
 
-    CORS_ORIGINS: Union[List[str], str] = [
+    CORS_ORIGINS: list[str] | str = [
         "http://localhost:5174",
         "http://localhost:3001",
         "http://localhost:5501",
@@ -30,6 +29,7 @@ class Settings(BaseSettings):
     def get_url_db(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
-    CATALOG_SERVICE_URL: str = "http://127.0.0.1:8000/products/"
+    CATALOG_SERVICE_URL: str = "http://catalog_service:8000" # запускаем через докер
+
 
 settings = Settings()
