@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from user_service.app.database import init_db
 from user_service.app.config import settings
 
-from order_service.app.routers.user import router as user_router
+from user_service.app.routers.user import router as user_router
 
 
 @asynccontextmanager
@@ -31,7 +31,8 @@ app.include_router(user_router)
 
 @app.get("/")
 async def main():
-    return {"message": "Welcome to Order-Service", "docs": "/docs"}
+    return {"message": "Welcome to User-Service", "docs": "/docs"}
+
 
 @app.get("/health")
 async def health():

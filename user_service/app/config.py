@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     SECRET_KEY: str
     ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5174",
