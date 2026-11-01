@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file="catalog_service/.env", extra="ignore")
 
     DEBUG: bool = True
-    APP_NAME: str = "OrderFlow_Microservices"
+    APP_NAME: str = "catalog_service"
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
