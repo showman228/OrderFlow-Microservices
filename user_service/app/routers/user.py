@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from user_service.app.models.users import User
 from user_service.app.database import get_db
 from user_service.app.core.security import Token
+from user_service.app.schemas.user import UserCreate, UserResponse
 from user_service.app.services.user_service import UserService, oauth2_scheme
 from user_service.app.config import settings
 from user_service.app.core.security import create_access_token
@@ -17,7 +18,7 @@ router = APIRouter(
     tags=["Users"]
 )
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: AsyncSession = Depends(get_db)
@@ -38,12 +39,18 @@ async def login(
     )
     return Token(access_token=access_token)
 
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db)) -> dict:
+    user = UserService(db)
+    new_user: UserResponse = user.create(user_data)
+    return {"message": f"User: {new_user.username} registered successfully"}
+
 @router.get("/me")
 async def read_me(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: AsyncSession = Depends(get_db)
-) -> User:
+) -> UserResponse:
 
     user = UserService(db)
-    return user.get_current_user(token)
+    return UserResponse.model_validate(user.get_current_user(token))
 

@@ -5,7 +5,6 @@ from user_service.app.core.security import hash_password, verify_password, decod
 
 from typing import Annotated
 
-from database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import Depends, HTTPException, status
@@ -72,7 +71,7 @@ class UserService:
 
         
     async def delete(self, user_id: int) -> bool:
-        user = await self.user_crud.get_by_id(user)
+        user = await self.user_crud.get_by_id(user_id)
 
         if not user:
             raise HTTPException(

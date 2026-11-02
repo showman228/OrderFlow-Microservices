@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     def get_url_db(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
-    CATALOG_SERVICE_URL: str = "http://catalog_service:8000" # запускаем через докер
+    # CATALOG_SERVICE_URL: str = "http://catalog_service:8000" запускаем через докер
 
 
 settings = Settings()
