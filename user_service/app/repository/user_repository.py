@@ -5,17 +5,18 @@ from pydantic import EmailStr
 
 from user_service.app.schemas.user import UserCreate
 
+
 class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def get_all(self) -> list[User]:
         users = await self.db.execute(select(User))
-        return users.scalars().all()        
+        return users.scalars().all()
 
     async def get_by_id(self, user_id: int) -> User | None:
         user = await self.db.execute(select(User).where(user_id == User.id))
-        return user.scalars().one_or_none
+        return user.scalars().one_or_none()
 
     async def get_by_username(self, username: str) -> User | None:
         user = await self.db.execute(select(User).where(username == User.username))
@@ -30,7 +31,7 @@ class UserRepository:
             email=user_data.email,
             password_hash=password_hash,
             username=user_data.username,
-            firstname=user_data.firstname
+            firstname=user_data.firstname,
         )
 
         self.db.add(user)
@@ -53,7 +54,6 @@ class UserRepository:
 
         return user
 
-    
     async def delete(self, user_id: int) -> bool:
         user = await self.get_by_id(user_id)
 

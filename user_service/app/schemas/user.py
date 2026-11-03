@@ -8,10 +8,12 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password_hash: str
+    password: str
+
 
 
 class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    password_hash: str

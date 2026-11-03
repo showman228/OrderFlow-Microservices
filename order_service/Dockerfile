@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 8001
 
-CMD ["python3", "-m", "uvicorn", "order_service.app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["python3", "-m", "uvicorn", "order_service.app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
