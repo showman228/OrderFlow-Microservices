@@ -46,6 +46,9 @@ services:
       order_db:
         condition: service_healthy
         restart: true
+      order_redis:
+        condition: service_healthy
+        restart: true
   
   order_db:
     image: postgres:16-alpine
@@ -61,6 +64,21 @@ services:
       - "5433:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-order_db}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  order_redis:
+    image: redis:8.10-alpine
+    container_name: order_redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-secret_key_for_redis}
+    command: ["sh", "-c", "redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -101,4 +119,6 @@ services:
 volumes:
   catalog_postgres_data:
   order_postgres_data:
+  redis-data:
+    driver: local
   user_postgres_data:
