@@ -8,6 +8,7 @@ from order_service.app.config import settings
 from order_service.app.routers.cart import router as cart_router
 from order_service.app.routers.order import router as order_router
 from order_service.app.services.catalog_client import CatalogClient
+from order_service.app.cache.redis import RedisCache
 import httpx
 
 
@@ -15,8 +16,10 @@ import httpx
 async def lifespan(app: FastAPI):
     await init_db()
     app.state.catalog_client = httpx.AsyncClient(base_url=settings.CATALOG_SERVICE_URL)
+    app.state.cache = RedisCache(settings.get_url_redis, settings.CACHE_TTL_SECONDS)
     yield
     await app.state.catalog_client.aclose()
+    await app.state.cache.close()
 
 
 app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)

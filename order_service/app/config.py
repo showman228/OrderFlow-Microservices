@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_DB: str
 
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
+    CACHE_TTL_SECONDS: int = 360    
+
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5174",
         "http://localhost:3001",
@@ -28,6 +33,10 @@ class Settings(BaseSettings):
     @property
     def get_url_db(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+    @property
+    def get_url_redis(self) -> str:
+        return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/0"
 
     CATALOG_SERVICE_URL: str = "http://catalog_service:8000" # запускаем через докер
 
