@@ -1,6 +1,14 @@
-from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
-from order_service.app.schemas.order_item import OrderItemResponse, OrderItemCreate
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from order_service.app.schemas.order_item import OrderItemResponse
+
+
+class OrderItemIn(BaseModel):
+    product_id: int = Field(..., ge=1, description="Product id from catalog service")
+    quantity: int = Field(..., ge=1, description="Quantity of product")
+
 
 class OrderBase(BaseModel):
 
@@ -8,18 +16,16 @@ class OrderBase(BaseModel):
 
     user_id: int
     status: str
-    total_price: int
+    total_price: float
+
 
 class OrderCreate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    items: list[OrderItemCreate]
-    user_id: int
+    user_id: int = Field(..., ge=1, description="Order owner id")
+    items: list[OrderItemIn] = Field(..., min_length=1, description="Ordered products")
 
 
 class OrderUpdate(BaseModel):
     user_id: int | None = None
-    items: list[OrderItemCreate] | None = None
     status: str | None = None
 
 
