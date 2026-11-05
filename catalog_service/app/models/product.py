@@ -17,10 +17,10 @@ class Product(Base):
     price: Mapped[int] = mapped_column(nullable=False)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
-    image_url: Mapped[str]
+    image_url: Mapped[str] = mapped_column(nullable=True)
 
     category: Mapped["Category"] = relationship(back_populates="products")
 

@@ -29,7 +29,6 @@ class ProductResponse(BaseModel):
     category_id: int
     image_url: str | None
     created_at: datetime
-    category: CategoryResponse = Field(..., description="Product category details")
 
 
 class ProductListResponse(BaseModel):

@@ -20,12 +20,17 @@ async def get_by_id(category_id: int, db: AsyncSession = Depends(get_db)):
     category_service = CategoryService(db)
     return await category_service.get_by_id(category_id)
 
-@router.get("/{category_name}", response_model=CategoryResponse, status_code=status.HTTP_200_OK)
+@router.get("/names/{category_name}", response_model=CategoryResponse, status_code=status.HTTP_200_OK)
 async def get_by_name(category_name: str, db: AsyncSession = Depends(get_db)):
     category_service = CategoryService(db)
     return await category_service.get_by_name(category_name)
 
-@router.get("/{category_slug}", response_model=CategoryResponse, status_code=status.HTTP_200_OK)
+@router.get("/slugs/{category_slug}", response_model=CategoryResponse, status_code=status.HTTP_200_OK)
 async def get_by_slug(category_slug: str, db: AsyncSession = Depends(get_db)):
     category_service = CategoryService(db)
     return await category_service.get_by_slug(category_slug)
+
+@router.post("/create", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
+async def create_category(category_data: CategoryCreate, db: AsyncSession = Depends(get_db)):
+    category_service = CategoryService(db)
+    return await category_service.create(category_data)

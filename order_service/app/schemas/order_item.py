@@ -5,7 +5,6 @@ from pydantic import BaseModel, ConfigDict
 class OrderItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    order_id: int
     product_id: int
     product_name: str
     quantity: int
@@ -17,6 +16,7 @@ class OrderItemCreate(OrderItem):
 
 
 class OrderItemUpdate(BaseModel):
+    order_id: int | None = None
     product_id: int | None = None
     product_name: str | None = None
     quantity: int | None = None

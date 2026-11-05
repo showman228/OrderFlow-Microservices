@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 class OrderItem(Base):
     __tablename__ = "order_items"
 
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), index=True)
     product_id: Mapped[int]
     product_name: Mapped[str] = mapped_column(nullable=False)
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
     quantity: Mapped[int] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(nullable=False)
 
