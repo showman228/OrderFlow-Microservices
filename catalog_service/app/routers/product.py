@@ -20,10 +20,15 @@ async def get_by_id(product_id: int, db: AsyncSession = Depends(get_db)):
     product_service = ProductService(db)
     return await product_service.get_by_id(product_id)
 
-@router.get("/{product_name}", response_model=ProductResponse, status_code=status.HTTP_200_OK)
+@router.get("/names/{product_name}", response_model=ProductResponse, status_code=status.HTTP_200_OK)
 async def get_by_name(product_name: str, db: AsyncSession = Depends(get_db)):
     product_service = ProductService(db)
     return await product_service.get_by_name(product_name)
+
+@router.post("/create", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
+async def create_product(product_data: ProductCreate, db: AsyncSession = Depends(get_db)):
+    product_service = ProductService(db)
+    return await product_service.create(product_data)
 
 
 

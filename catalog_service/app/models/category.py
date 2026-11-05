@@ -14,7 +14,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, index=True
     )
-    slug: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    slug: Mapped[str] = mapped_column(unique=True, index=True, nullable=True)
 
     products: Mapped[list["Product"]] = relationship(back_populates="category")
 
