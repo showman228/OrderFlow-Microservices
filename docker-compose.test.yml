@@ -1,0 +1,48 @@
+services:
+  catalog_test_db:
+    image: postgres:16-alpine
+    container_name: catalog_test_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: catalog_test
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d catalog_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user_test_db:
+    image: postgres:16-alpine
+    container_name: user_test_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_test
+    ports:
+      - "5436:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d user_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  order_test_db:
+    image: postgres:16-alpine
+    container_name: order_test_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_test
+    ports:
+      - "5437:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
