@@ -14,6 +14,19 @@ TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5439/payme
 test_engine, TestSessionLocal = create_test_session_factory(TEST_DATABASE_URL)
 
 
+class FakeProducer:
+    """Заглушка PaymentProducer: RabbitMQ не поднимаем."""
+
+    async def connect(self) -> None:
+        return None
+
+    async def publish(self, routing_key: str, data: dict) -> None:
+        return None
+
+    async def close(self) -> None:
+        return None
+
+
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def manage_engine():
     yield
@@ -50,6 +63,14 @@ def fast_payment_delay(monkeypatch):
 
 @pytest_asyncio.fixture
 async def client():
+    """HTTP-клиент + заглушка RabbitMQ-продюсера.
+
+    Эндпоинты payment_service читают app.state.payment_producer, который
+    в обычном режиме создаётся только в lifespan. ASGITransport lifespan
+    не выполняет, поэтому заполняем app.state вручную.
+    """
+    app.state.payment_producer = FakeProducer()
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         yield c

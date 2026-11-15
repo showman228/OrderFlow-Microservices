@@ -16,7 +16,14 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_PASSWORD: str
-    CACHE_TTL_SECONDS: int = 360    
+    CACHE_TTL_SECONDS: int = 360
+
+    RABBIT_MQ_URL: str = "amqp://guest:guest@localhost:5672"
+    payment_paid_routing_key: str = "payment.paid"
+    payment_fail_routing_key: str = "payment.fail"
+    payment_cancel_routing_key: str = "payment.cancel"
+    payment_exchange_name: str = "payment.events"
+    payment_queue_name: str = "payment.results"
 
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5174",
@@ -39,6 +46,7 @@ class Settings(BaseSettings):
         return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/0"
 
     CATALOG_SERVICE_URL: str = "http://catalog_service:8000" # запускаем через докер
+    PAYMENT_SERVICE_URL: str = "http://payment_service:8003" # запускаем через докер
 
 
 settings = Settings()

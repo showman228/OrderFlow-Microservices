@@ -3,6 +3,7 @@ import asyncio
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from payment_service.app.producer import PaymentProducer
 from payment_service.app.config import settings
 from payment_service.app.models.payment import Payment, PaymentStatus
 from payment_service.app.repository.payment_repository import PaymentRepository
@@ -43,26 +44,41 @@ class PaymentService:
         await self.crud.delete(payment_id)
         return True
 
-    async def pay(self, payment_id: int) -> PaymentResponse:
+    async def pay(self, payment_id: int, producer: PaymentProducer) -> PaymentResponse:
         payment = await self._get_or_404(payment_id)
         self._ensure_status(payment, {PaymentStatus.PENDING}, "paid")
 
         await self.crud.update_status(payment.id, PaymentStatus.PROCESSING.value)
         await asyncio.sleep(settings.PAYMENT_DELAY_SECONDS)
         updated = await self.crud.update_status(payment.id, PaymentStatus.PAID.value)
-
+        # передаем в consumer
+        message = {
+            "order_id": payment.order_id,
+            "status": PaymentStatus.PAID.value,
+            "user_id": payment.user_id,
+            "amount": payment.amount,
+        }
+        await producer.publish(settings.payment_paid_routing_key, message)
         return PaymentResponse.model_validate(updated)
 
-    async def fail(self, payment_id: int) -> PaymentResponse:
+    async def fail(self, payment_id: int, producer: PaymentProducer) -> PaymentResponse:
         payment = await self._get_or_404(payment_id)
         self._ensure_status(
             payment, {PaymentStatus.PENDING, PaymentStatus.PROCESSING}, "failed"
         )
 
         updated = await self.crud.update_status(payment.id, PaymentStatus.FAILED.value)
+        # передаем в consumer
+        message = {
+            "order_id": payment.order_id,
+            "status": PaymentStatus.FAILED.value,
+            "user_id": payment.user_id,
+            "amount": payment.amount,
+        }
+        await producer.publish(settings.payment_fail_routing_key, message)
         return PaymentResponse.model_validate(updated)
 
-    async def cancel(self, payment_id: int) -> PaymentResponse:
+    async def cancel(self, payment_id: int, producer: PaymentProducer) -> PaymentResponse:
         payment = await self._get_or_404(payment_id)
         if payment.status == PaymentStatus.PAID.value:
             raise HTTPException(
@@ -73,6 +89,14 @@ class PaymentService:
         updated = await self.crud.update_status(
             payment.id, PaymentStatus.CANCELLED.value
         )
+        # передаем в consumer
+        message = {
+            "order_id": payment.order_id,
+            "status": PaymentStatus.CANCELLED.value,
+            "user_id": payment.user_id,
+            "amount": payment.amount,
+        }
+        await producer.publish(settings.payment_cancel_routing_key, message)
         return PaymentResponse.model_validate(updated)
 
     async def _get_or_404(self, payment_id: int) -> Payment:

@@ -4,7 +4,7 @@ from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from order_service.app.cache.redis import RedisCache
-from order_service.app.services.catalog_client import CatalogClient
+from order_service.app.api_clients.catalog_client import CatalogClient
 from order_service.app.database import get_db
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]

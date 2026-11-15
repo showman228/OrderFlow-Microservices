@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from order_service.app.schemas.cart import CartItem, CartResponse
 from order_service.app.schemas.catalog_product import CatalogProductResponse
-from order_service.app.services.catalog_client import CatalogClient
+from order_service.app.api_clients.catalog_client import CatalogClient
 
 # Делаем запрос (_fetch_product) -> делаем item (_build_cart_item) -> собираем items вместе (_build_cart_items) -> делаем ответ в корректной форме (_build_response)
 class CartService:

@@ -5,13 +5,18 @@ from fastapi.staticfiles import StaticFiles
 from payment_service.app.database import init_db
 from payment_service.app.config import settings
 from payment_service.app.routers.payment import router as payment_router
-
+from payment_service.app.producer import PaymentProducer
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
     await init_db()
+    # подключаемся к rabbitMQ
+    producer = PaymentProducer(settings.RABBIT_MQ_URL, settings.payment_exchange_name)
+    await producer.connect()
+    app.state.payment_producer = producer
     yield
+    await producer.close()
 
 
 app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)

@@ -15,6 +15,14 @@ class Settings(BaseSettings):
 
     PAYMENT_DELAY_SECONDS: float = 2.0
 
+    RABBIT_MQ_URL: str = "amqp://guest:guest@localhost:5672"
+    payment_paid_routing_key: str = "payment.paid"
+    payment_fail_routing_key: str = "payment.fail"
+    payment_cancel_routing_key: str = "payment.cancel"
+    payment_exchange_name: str = "payment.events"
+    payment_queue_name: str = "payment.results"
+
+
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5173",
         "http://localhost:3000",
