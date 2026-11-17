@@ -92,7 +92,7 @@ class OrderService:
             ORDER_CACHE_KEY.format(order_id=order.id), response.model_dump(mode="json")
         )
         await self.cache.delete(USER_ORDERS_CACHE_KEY.format(user_id=order_data.user_id))
-        self.payment_client.create_payment(
+        await self.payment_client.create_payment(
             order_id=order.id,
             user_id=order.user_id,
             amount=order.total_price

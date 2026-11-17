@@ -7,7 +7,7 @@ from redis.exceptions import RedisError
 class RedisCache:
 
     def __init__(self, redis_url: str, cache_ttl: int | None = None):
-        self.redis = Redis.from_url(redis_url, decoded_responses=True)
+        self.redis = Redis.from_url(redis_url, decode_responses=True)
         self.cache_ttl = cache_ttl
 
     async def set_value(self, key: str, value: dict | list) -> None:

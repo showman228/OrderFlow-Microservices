@@ -1,4 +1,3 @@
-from order_service.app.config import settings
 from pydantic import BaseModel
 
 class PaymentResponse(BaseModel):
@@ -16,6 +15,6 @@ class PaymentClient:
             "user_id": user_id,
             "amount": amount
         }
-        response = await self.client.post(f"{settings.PAYMENT_SERVICE_URL}/payments/create", json=json_data)
+        response = await self.client.post("/payments/create", json=json_data)
         response.raise_for_status()
         return PaymentResponse.model_validate(response.json())
