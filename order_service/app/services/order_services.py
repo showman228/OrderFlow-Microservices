@@ -9,7 +9,9 @@ from order_service.app.repository.order_repository import OrderRepository
 from order_service.app.schemas.catalog_product import CatalogProductResponse
 from order_service.app.schemas.order import OrderCreate, OrderResponse, OrderUpdate
 from order_service.app.schemas.order_item import OrderItemCreate
-from order_service.app.services.catalog_client import CatalogClient
+from order_service.app.api_clients.catalog_client import CatalogClient
+from order_service.app.api_clients.payment_client import PaymentClient
+
 
 ORDER_CACHE_KEY: str = "order:{order_id}"
 USER_ORDERS_CACHE_KEY: str = "orders:user:{user_id}"
@@ -19,11 +21,13 @@ class OrderService:
             self, 
             db: AsyncSession, 
             catalog_client: CatalogClient, 
+            payment_client: PaymentClient,
             cache: RedisCache
 
     ) -> None:
         self.crud = OrderRepository(db)
         self.catalog_client = catalog_client
+        self.payment_client = payment_client
         self.cache = cache
 
     async def get_by_id(self, order_id: int) -> OrderResponse:
@@ -88,7 +92,11 @@ class OrderService:
             ORDER_CACHE_KEY.format(order_id=order.id), response.model_dump(mode="json")
         )
         await self.cache.delete(USER_ORDERS_CACHE_KEY.format(user_id=order_data.user_id))
-
+        await self.payment_client.create_payment(
+            order_id=order.id,
+            user_id=order.user_id,
+            amount=order.total_price
+        )
         return response
 
     async def update(self, order_id: int, order_data: OrderUpdate) -> OrderResponse:
