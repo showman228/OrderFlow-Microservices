@@ -5,6 +5,7 @@ class Notification(BaseModel):
     order_id: int
     status: str
     total_price: float
+    message: str
 
 class NotificationCreate(Notification):
     pass
@@ -17,4 +18,5 @@ class NotificationResponse(BaseModel):
     order_id: int
     status: str
     total_price: float
+    message: str
 

@@ -14,22 +14,44 @@ class NotificationRepository:
         return notif.scalars().one_or_none()
 
     async def get_notification_by_user_id(self, user_id: int) -> list[Notification]:
-        notif = await self.db.execute(
-            select(Notification).where(Notification.user_id == user_id)
+        notifs = await self.db.execute(
+            select(Notification)
+            .where(Notification.user_id == user_id)
+            .limit(5)
+            .offset(5)
+            .order_by(Notification.id.desc())
         )
 
-        return notif.scalars().one_or_none()
+        return list(notifs.scalars().all())
 
     async def get_all_notification(self) -> list[Notification]:
         notifs = await self.db.execute(
             select(Notification)
+            .order_by(Notification.id.desc())
         )
 
         return notifs.scalars().all()
 
     async def create(self, notif_data: NotificationCreate) -> Notification:
-        pass
+        notif = Notification(
+            user_id=notif_data.user_id,
+            order_id=notif_data.order_id,
+            status=notif_data.status,
+            total_price=notif_data.total_price,
+            message=notif_data.message,
+        )
+
+        self.db.add(notif)
+        await self.db.commit()
+        return notif
 
     async def delete(self, notif_id: int) -> bool:
-        pass
+        notif = await self.db.execute(select(Notification).where(Notification.id == notif_id))
+        if notif is None:
+            return False
+
+        await self.db.delete(notif)
+        await self.db.commit()
+        return True
+
     
