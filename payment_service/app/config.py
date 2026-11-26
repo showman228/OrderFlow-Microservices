@@ -32,8 +32,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5500",
     ]
 
-    static_dir: str = "payment_service/static"
-    images_dir: str = "payment_service/static/images"
+
 
     @property
     def get_url_db(self) -> str:

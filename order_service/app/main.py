@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from order_service.app.database import init_db
 from order_service.app.config import settings
 
@@ -52,7 +51,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
 app.include_router(cart_router)
 app.include_router(order_router)

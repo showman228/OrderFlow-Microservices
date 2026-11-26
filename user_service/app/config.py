@@ -23,8 +23,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5501",
     ]
 
-    static_dir: str = "catalog_service/static"
-    images_dir: str = "catalog_service/static/images"
+
 
     @property
     def get_url_db(self) -> str:
