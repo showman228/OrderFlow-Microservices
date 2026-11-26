@@ -240,10 +240,9 @@ class UserRepository:
 
 ## 11. Error handling
 
-- In `services` / `repositories`, raise **domain exceptions** (subclasses of `AppError`), not `HTTPException`.
-- Converting domain exceptions into HTTP responses happens in **global exception handlers** (`app.add_exception_handler`).
+- In `services` / `repositories`, raise **domain exceptions** (subclasses of `AppError`), also you can use `HTTPException`.
 - No bare `except:`, and avoid `except Exception:`. Catch specific exceptions.
-- Do not swallow errors silently. Either handle them meaningfully, or log and re-raise.
+- Do not swallow errors silently. you should handle them meaningfully, dont use any logging, because, this pet-project.
 - When re-raising, preserve the cause: `raise DomainError(...) from exc`.
 - The error response format is uniform across the service:
 
