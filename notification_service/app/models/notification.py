@@ -1,12 +1,12 @@
 from enum import StrEnum
 
 from datetime import datetime, UTC
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from notification_service.app.database import Base
 
 class NotificationType(StrEnum):
-    ORDER_CREATE = "create"
+    ORDER_CREATE = "created"
     ORDER_PAID = "paid"
 
 class Notification(Base):
@@ -18,7 +18,7 @@ class Notification(Base):
         String(20), default=NotificationType.ORDER_CREATE.value, nullable=False
     )
     message: Mapped[str] = mapped_column(
-        String(100), nullable=False
+        Text, nullable=False
     )
     total_price: Mapped[float] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(

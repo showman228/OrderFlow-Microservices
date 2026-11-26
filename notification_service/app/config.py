@@ -13,8 +13,6 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_DB: str
 
-    TG_URL: str
-
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5173",
         "http://localhost:3000",
@@ -24,8 +22,6 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5500",
     ]
 
-    static_dir: str = "catalog_service/static"
-    images_dir: str = "catalog_service/static/images"
 
     @property
     def get_url_db(self) -> str:

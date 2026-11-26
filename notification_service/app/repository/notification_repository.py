@@ -10,15 +10,17 @@ class NotificationRepository:
         self.db = db
 
     async def get_notification_by_id(self, notif_id: int) -> Notification | None:
-        notif = await self.db.execute(select(Notification).where(Notification.id == notif_id))
+        notif = await self.db.execute(
+            select(Notification).where(Notification.id == notif_id)
+        )
         return notif.scalars().one_or_none()
 
-    async def get_notification_by_user_id(self, user_id: int) -> list[Notification]:
+    async def get_notification_by_user_id(self, user_id: int, limit: int = 20, offset: int = 0) -> list[Notification]:
         notifs = await self.db.execute(
             select(Notification)
             .where(Notification.user_id == user_id)
-            .limit(5)
-            .offset(5)
+            .limit(limit)
+            .offset(offset)
             .order_by(Notification.id.desc())
         )
 
@@ -26,11 +28,10 @@ class NotificationRepository:
 
     async def get_all_notification(self) -> list[Notification]:
         notifs = await self.db.execute(
-            select(Notification)
-            .order_by(Notification.id.desc())
+            select(Notification).order_by(Notification.id.desc())
         )
 
-        return notifs.scalars().all()
+        return list(notifs.scalars().all())
 
     async def create(self, notif_data: NotificationCreate) -> Notification:
         notif = Notification(
@@ -46,12 +47,10 @@ class NotificationRepository:
         return notif
 
     async def delete(self, notif_id: int) -> bool:
-        notif = await self.db.execute(select(Notification).where(Notification.id == notif_id))
+        notif = await self.get_notification_by_id(notif_id)
         if notif is None:
             return False
 
         await self.db.delete(notif)
         await self.db.commit()
         return True
-
-    

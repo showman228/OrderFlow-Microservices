@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from notification_service.app.database import init_db
 from notification_service.app.config import settings
+from notification_service.app.routers.notification import router as notification_router
 import httpx
 
 @asynccontextmanager
@@ -24,8 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
-
+app.include_router(notification_router)
 
 @app.get("/")
 async def main():
