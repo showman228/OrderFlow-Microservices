@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_DB: str
 
+    RABBIT_MQ_URL: str = "amqp://guest:guest@localhost:5672"
+    order_exchange_name: str = "order.events"
+    notification_queue_name: str = "notification.orders"
+    order_created_routring_key: str = "order.created"
+    order_paid_routing_key: str = "order.paid"
+
+
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5173",
         "http://localhost:3000",

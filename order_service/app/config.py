@@ -19,11 +19,18 @@ class Settings(BaseSettings):
     CACHE_TTL_SECONDS: int = 360
 
     RABBIT_MQ_URL: str = "amqp://guest:guest@localhost:5672"
+    #payment_service
     payment_paid_routing_key: str = "payment.paid"
     payment_fail_routing_key: str = "payment.fail"
     payment_cancel_routing_key: str = "payment.cancel"
     payment_exchange_name: str = "payment.events"
     payment_queue_name: str = "payment.results"
+
+    #notification_service
+    order_exchange_name: str = "order.events"
+    order_queue_name: str = "notification.orders"
+    order_created_routring_key: str = "order.created"
+    order_paid_routing_key: str = "order.paid"
 
     CORS_ORIGINS: list[str] | str = [
         "http://localhost:5174",

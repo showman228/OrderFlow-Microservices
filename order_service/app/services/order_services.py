@@ -4,6 +4,8 @@ import httpx
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from order_service.app.config import settings
+from order_service.app.producer import OrderProducer
 from order_service.app.cache.redis import RedisCache
 from order_service.app.repository.order_repository import OrderRepository
 from order_service.app.schemas.catalog_product import CatalogProductResponse
@@ -22,8 +24,7 @@ class OrderService:
             db: AsyncSession, 
             catalog_client: CatalogClient, 
             payment_client: PaymentClient,
-            cache: RedisCache
-
+            cache: RedisCache,
     ) -> None:
         self.crud = OrderRepository(db)
         self.catalog_client = catalog_client
@@ -67,7 +68,7 @@ class OrderService:
         orders = await self.crud.get_by_status(order_status)
         return [OrderResponse.model_validate(od) for od in orders]
 
-    async def create(self, order_data: OrderCreate) -> OrderResponse:
+    async def create(self, order_data: OrderCreate, producer: OrderProducer) -> OrderResponse:
         products = await self._fetch_products(order_data)
 
         items = [
@@ -86,7 +87,12 @@ class OrderService:
             total_price=total_price,
             items=items,
         )
-
+        message = {
+            "order_id": order.id,
+            "user_id": order.user_id,
+            "amount": order.total_price
+        }
+        await producer.publish(settings.order_created_routring_key, message)
         response = OrderResponse.model_validate(order)
         await self.cache.set_value(
             ORDER_CACHE_KEY.format(order_id=order.id), response.model_dump(mode="json")

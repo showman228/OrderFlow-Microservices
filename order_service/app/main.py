@@ -9,6 +9,7 @@ from order_service.app.routers.order import router as order_router
 from order_service.app.api_clients.catalog_client import CatalogClient
 from order_service.app.cache.redis import RedisCache
 from order_service.app.consumer import PaymentConsumer
+from order_service.app.producer import OrderProducer
 import httpx
 
 
@@ -18,6 +19,10 @@ async def lifespan(app: FastAPI):
     app.state.catalog_client = httpx.AsyncClient(base_url=settings.CATALOG_SERVICE_URL)
     app.state.cache = RedisCache(settings.get_url_redis, settings.CACHE_TTL_SECONDS)
     app.state.payment_client = httpx.AsyncClient(base_url=settings.PAYMENT_SERVICE_URL)
+
+    producer = OrderProducer(settings.RABBIT_MQ_URL, settings.order_exchange_name)
+    await producer.connect()
+    app.state.order_producer = producer
 
     consumer = PaymentConsumer(
         url=settings.RABBIT_MQ_URL,
@@ -29,13 +34,16 @@ async def lifespan(app: FastAPI):
             settings.payment_cancel_routing_key,
         ],
         cache=app.state.cache,
+        producer=producer
     )
     await consumer.connect()
     app.state.payment_consumer = consumer
+    
 
     yield
 
     await consumer.close()
+    await producer.close()
     await app.state.catalog_client.aclose()
     await app.state.cache.close()
     await app.state.payment_client.aclose()
