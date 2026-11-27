@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Path, status
 
-from order_service.app.deps import CatalogClientDep, SessionDep, CacheDep, PaymentClientDep
+from order_service.app.deps import CatalogClientDep, OrderProducerDep, SessionDep, CacheDep, PaymentClientDep
 from order_service.app.schemas.order import OrderCreate, OrderResponse, OrderUpdate
 from order_service.app.services.order_services import OrderService
 
@@ -57,10 +57,10 @@ async def get_by_id(
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=OrderResponse)
 async def create_order(
-    order_data: OrderCreate, db: SessionDep, catalog_client: CatalogClientDep, payment_client: PaymentClientDep, cache: CacheDep
+    order_data: OrderCreate, db: SessionDep, catalog_client: CatalogClientDep, payment_client: PaymentClientDep, cache: CacheDep, producer: OrderProducerDep
 ) -> OrderResponse:
     service = OrderService(db, catalog_client, payment_client, cache)
-    return await service.create(order_data)
+    return await service.create(order_data, producer)
 
 
 @router.patch("/{order_id}", status_code=status.HTTP_200_OK, response_model=OrderResponse)

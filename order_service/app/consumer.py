@@ -13,6 +13,8 @@ from order_service.app.models.order import Order, PaymentStatus
 from order_service.app.repository.order_repository import OrderRepository
 from order_service.app.schemas.order import OrderUpdate
 from order_service.app.services.order_services import ORDER_CACHE_KEY, USER_ORDERS_CACHE_KEY
+from order_service.app.producer import OrderProducer
+from order_service.app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +35,14 @@ class PaymentConsumer:
         queue_name: str,
         routing_keys: list[str],
         cache: RedisCache,
+        producer: OrderProducer
     ) -> None:
         self._url = url
         self._exchange_name = exchange_name
         self._queue_name = queue_name
         self._routing_keys = routing_keys
         self._cache = cache
+        self._producer = producer
         self._connection: AbstractRobustConnection | None = None
 
     async def connect(self) -> None:
@@ -74,6 +78,16 @@ class PaymentConsumer:
                 return
 
             await self._invalidate_cache(updated)
+
+            if event.status == PaymentStatus.PAID:
+                await self._producer.publish(
+                    routing_key=settings.order_paid_routing_key,
+                    data={
+                        "order_id": updated.id,
+                        "user_id": updated.user_id,
+                        "amount": event.amount
+                    }
+                )
 
     async def _invalidate_cache(self, order: Order) -> None:
         await self._cache.delete(ORDER_CACHE_KEY.format(order_id=order.id))
