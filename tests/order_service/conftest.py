@@ -1,8 +1,11 @@
+from collections.abc import AsyncIterator
+
 import httpx
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from order_service.app.config import settings
 from order_service.app.database import Base, get_db
 from order_service.app.main import app
 from order_service.app.models import Order
@@ -65,23 +68,20 @@ def override_dependencies():
 
 
 @pytest_asyncio.fixture
-async def client():
-    """HTTP-клиент + заглушки внешних зависимостей (каталог, кеш).
-
-    Эндпоинты order_service читают app.state.catalog_client и app.state.cache,
-    которые в обычном режиме создаются только в lifespan. ASGITransport lifespan
-    не выполняет, поэтому заполняем app.state вручную.
-    """
-    app.state.catalog_client = httpx.AsyncClient(
-        transport=httpx.MockTransport(_catalog_handler), base_url="http://test"
-    )
-    app.state.cache = FakeCache()
-
+async def client(monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[httpx.AsyncClient]:
+    """Настраивает app.state вручную, поскольку ASGITransport не запускает lifespan."""
     transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:
-        yield c
-
-    await app.state.catalog_client.aclose()
+    async with (
+        httpx.AsyncClient(
+            transport=httpx.MockTransport(_catalog_handler), base_url="http://test"
+        ) as catalog_client,
+        httpx.AsyncClient(base_url=settings.PAYMENT_SERVICE_URL) as payment_client,
+        httpx.AsyncClient(transport=transport, base_url="http://test") as test_client,
+    ):
+        monkeypatch.setattr(app.state, "catalog_client", catalog_client, raising=False)
+        monkeypatch.setattr(app.state, "payment_client", payment_client, raising=False)
+        monkeypatch.setattr(app.state, "cache", FakeCache(), raising=False)
+        yield test_client
 
 
 @pytest_asyncio.fixture
