@@ -1,0 +1,8 @@
+.git
+.venv
+.superpowers
+.worktrees
+.pytest_cache
+**/__pycache__
+**/.env
+**/.env.*
